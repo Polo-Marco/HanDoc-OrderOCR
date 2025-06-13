@@ -5,6 +5,6 @@ processed/
 saved/
 *.pyc
 flagged/
-paddleOCR/
+PaddleOCR/
 models/
 
