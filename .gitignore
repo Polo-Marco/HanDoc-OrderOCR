@@ -1,0 +1,10 @@
+__pycache__/
+output/
+**/.ipynb_checkpoints/
+processed/
+saved/
+*.pyc
+flagged/
+paddleOCR/
+models/
+

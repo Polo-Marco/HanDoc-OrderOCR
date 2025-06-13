@@ -1,0 +1,100 @@
+Global:
+  debug: false
+  use_gpu: true
+  epoch_num: 1200
+  log_smooth_window: 20
+  print_batch_step: 30
+  save_model_dir: 
+  save_epoch_step: 600
+  eval_batch_step:
+  - 1000
+  - 500
+  cal_metric_during_train: false
+  pretrained_model: ../models/det_model/inference
+  checkpoints:
+  save_inference_dir: 
+  use_visualdl: false
+  infer_mode: true
+  infer_img: ../saved
+  save_res_path: ../output/predicts_db.txt
+Architecture:
+  model_type: det
+  algorithm: DB++
+  Transform: null
+  Backbone:
+    name: ResNet
+    layers: 50
+    dcn_stage: [False, True, True, True]
+  Neck:
+    name: DBFPN
+    out_channels: 256
+    use_asf: True
+  Head:
+    name: DBHead
+    k: 50
+Loss:
+  name: DBLoss
+  balance_loss: true
+  main_loss_type: BCELoss
+  alpha: 5
+  beta: 10
+  ohem_ratio: 3
+Optimizer:
+  name: Momentum
+  momentum: 0.9
+  lr:
+    name: DecayLearningRate
+    learning_rate: 0.007
+    epochs: 1000
+    factor: 0.9
+    end_lr: 0
+  weight_decay: 0.0001
+PostProcess:
+  name: DBPostProcess
+  thresh: 0.3
+  box_thresh: 0.6
+  max_candidates: 500 #1000
+  unclip_ratio: 1.5
+Metric:
+  name: DetMetric
+  main_indicator: hmean
+Eval:
+  dataset:
+    name: SimpleDataSet
+    data_dir:                                                          
+    label_file_list:                                                                                            
+    - 
+    transforms:
+    - DecodeImage:
+        img_mode: RGB
+        channel_first: false
+    - DetLabelEncode: null
+    - DetResizeForTest:
+        image_shape:
+        - 960
+        - 960
+    - NormalizeImage:
+        scale: 1./255.
+        mean:
+        - 0.787
+        - 0.805
+        - 0.814
+        std:
+        - 0.236
+        - 0.241
+        - 0.243
+        order: hwc
+    - ToCHWImage: null
+    - KeepKeys:
+        keep_keys:
+        - image
+        - shape
+        - polys
+        - ignore_tags
+  loader:
+    use_shared_memory: False
+    shuffle: false
+    drop_last: false
+    batch_size_per_card: 1
+    num_workers: 8
+profiler_options: null
