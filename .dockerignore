@@ -9,4 +9,5 @@ app/saved/*
 **/.ipynb_checkpoints/
 *.pyc
 PaddleOCR/
+models/*
 

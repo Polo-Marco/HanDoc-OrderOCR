@@ -1,5 +1,6 @@
 gradio==3.50.2
 Pillow==9.5.0
+gdown
 #VORO
 torch
 torchvision

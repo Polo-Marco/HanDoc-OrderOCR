@@ -36,6 +36,9 @@ RUN pip install --no-cache-dir -r /app/PaddleOCR/requirements.txt
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Download Models
+RUN bash scripts/download_models.sh
+
 # (Optional) Run model download script if you have one
 # RUN bash scripts/download_models.sh
 
