@@ -3,11 +3,18 @@ output/det_results/*
 output/order_results/*
 output/rec_results/*
 output/rec_images/*
+!output/det_results/.gitkeep
+!output/order_results/.gitkeep
+!output/rec_results/.gitkeep
+!output/rec_images/.gitkeep
 app/flagged/
 app/processed/*
 app/saved/*
+!app/processed/.gitkeep
+!app/saved/.gitkeep
 **/.ipynb_checkpoints/
 *.pyc
 PaddleOCR/
 models/*
+!models/.gitkeep
 
