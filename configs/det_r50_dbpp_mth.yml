@@ -15,8 +15,8 @@ Global:
   save_inference_dir: 
   use_visualdl: false
   infer_mode: true
-  infer_img: ../saved
-  save_res_path: ../output/predicts_db.txt
+  infer_img: ./saved
+  save_res_path: ../output/det_results/predicts.txt
 Architecture:
   model_type: det
   algorithm: DB++

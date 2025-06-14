@@ -8,10 +8,10 @@ from utils import *
 import cv2
 import threading
 import time
-file_dict = {"SAVE_FOLDER":"../saved/",
-            "REC_FOLDER" : "../output/rec_imgs/",
-            "ORDER_FOLDER":"../output/order_det/",
-            "PROCESSED_FOLDER":"../processed/"}
+file_dict = {"SAVE_FOLDER":"./saved/",
+            "REC_FOLDER" : "../output/rec_images/",
+            "ORDER_FOLDER":"../output/order_results/",
+            "PROCESSED_FOLDER":"./processed/"}
 
 def crop_det_img(filename,det_result_path):
     print("croping det results")
@@ -28,7 +28,7 @@ def process_image(input_image,progress):
     #save image first
     progress(0.1, desc="Saving image")
     #image = Image.fromarray((input_image * 255).astype(np.uint8))
-    input_image.save("../saved/input_image.jpg")
+    input_image.save(f"{file_dict['SAVE_FOLDER']}input_image.jpg")
 
     #detection
     progress(0.2, desc="Detecting texts")
@@ -38,7 +38,7 @@ def process_image(input_image,progress):
             raise RuntimeError("Detection failed.")
     #order detection
     progress(0.5, desc="Detecting order")
-    order_preproc(file_dict['SAVE_FOLDER'],[filename],"../output/predicts_db.txt",file_dict['ORDER_FOLDER'])
+    order_preproc(file_dict['SAVE_FOLDER'],[filename],"../output/det_results/predicts.txt",file_dict['ORDER_FOLDER'])
     order_thread = threading.Thread(target = subprocess.run,args=("bash ../scripts/order_predict.sh",), 
                                               kwargs={'shell': True})
     order_thread.start()
@@ -46,7 +46,7 @@ def process_image(input_image,progress):
     print("order process complete")
     progress(0.7, desc="Recognizing texts")
     ## rec preprocess start
-    rec_preproc_thread = threading.Thread(target = crop_det_img, args = (filename,"../output/predicts_db.txt"))
+    rec_preproc_thread = threading.Thread(target = crop_det_img, args = (filename,"../output/det_results/predicts.txt"))
     rec_preproc_thread.start()
     ## rec_process
     rec_preproc_thread.join()#make sure crop process done
@@ -59,8 +59,8 @@ def process_image(input_image,progress):
     progress(0.8, desc="Visualizing results")
     #visualize det + rec results
     img_vis,seq_txt=vis_det_rec(filename,
-                        file_dict['SAVE_FOLDER']+filename,"../output/predicts_db.txt",
-                        "../output/predicts_svtr_tiny_ch_all.txt",
+                        file_dict['SAVE_FOLDER']+filename,"../output/det_results/predicts.txt",
+                        "../output/rec_results/predicts.txt",
                         file_dict['ORDER_FOLDER'])
     img_vis.save(file_dict['PROCESSED_FOLDER']+filename)
     return seq_txt
