@@ -83,9 +83,9 @@ iface = gr.Interface(
         gr.Textbox(label="Image Info"),
     ],
     examples=[
-        ["../examples/JX_245_2_157.jpg"],
-        ["../examples/YB_24_204.jpg"],
-        ["../examples/06-V008P0195.jpg"],
+        ["./examples/JX_245_2_157.jpg"],
+        ["./examples/YB_24_204.jpg"],
+        ["./examples/06-V008P0195.jpg"],
     ],
     title="OCR system for Chinese Historical Documents(Machine Intelligence Group, MIG)"
 ).queue(concurrency_count=1)
