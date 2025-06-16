@@ -51,6 +51,8 @@ examples = [
 
 def gradio_interface(input_image,progress=gr.Progress()):
     try:
+        #before process clean temp
+        subprocess.run(f"bash {CONFIG['CLEAN_SCRIPT']}",shell=True)
         #human readable input naming
         filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
         output_image, text_output = process_image(filename,input_image,progress)
