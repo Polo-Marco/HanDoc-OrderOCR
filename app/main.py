@@ -7,7 +7,7 @@ from utils import *
 from pipline import detect_text, detect_order,recognize_text
 import cv2
 import traceback
-import time
+from datetime import datetime
 import logging
 from config import FILE_DICT, CONFIG, RESULT_FILES,DEBUG
 
@@ -17,23 +17,19 @@ logging.basicConfig(
 )
 
 
-def process_image(input_image,progress):
-    filename = "input_image.jpg"
+def process_image(filename, input_image,progress):
     ori_img_path = os.path.join(FILE_DICT['SAVE_FOLDER'], filename)
     #save image first
     progress(0.1, desc="Saving image")
     input_image.save(ori_img_path)
-    # detection
     progress(0.2, desc="Detecting texts")
     det_result_file = RESULT_FILES["DET_RESULT"]
     detect_text(det_result_file,debug=DEBUG)
-    # order detection
     progress(0.5, desc="Detecting order")
     order_preprocess_file = RESULT_FILES["ORDER_PREPROCESS"]
     order_result_file = RESULT_FILES["ORDER_RESULT"]
     detect_order(ori_img_path,det_result_file,order_preprocess_file,order_result_file,debug=DEBUG)
     progress(0.7, desc="Recognizing texts")
-    # rec process start
     rec_result_file = RESULT_FILES["REC_RESULT"]
     recognize_text(ori_img_path,det_result_file,rec_result_file,debug=DEBUG)
     progress(0.8, desc="Visualizing results")
@@ -47,12 +43,14 @@ def process_image(input_image,progress):
 
 def gradio_interface(input_image,progress=gr.Progress()):
     try:
-        text_output = process_image(input_image,progress)
-        processed_img_path = os.path.join(FILE_DICT['PROCESSED_FOLDER'], "input_image.jpg")
+        #human readable input naming
+        filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
+        text_output = process_image(filename,input_image,progress)
+        processed_img_path = os.path.join(FILE_DICT['PROCESSED_FOLDER'], filename)
         with Image.open(processed_img_path) as img:
             output_image = img.copy()
-        # show image
-        #subprocess.run(f"bash {CONFIG['CLEAN_SCRIPT']}",shell=True)
+        # run clean bash
+        subprocess.run(f"bash {CONFIG['CLEAN_SCRIPT']}",shell=True)
         logging.info("one request completed")
         return output_image, ",".join(text_output)
     except Exception as e:
