@@ -7,7 +7,7 @@ import warnings
 from tqdm import tqdm
 import subprocess
 import logging
-from config import FILE_DICT,CONFIG
+from config import FILE_DICT,CONFIG,RESULT_FILES
 warnings.filterwarnings('ignore')
 font = ImageFont.truetype("./font/NotoSerifCJKtc-ExtraLight.otf", 30)
 def path_exist(path)->bool:
@@ -115,7 +115,6 @@ def vis_det_rec(ori_img_path,det_path,rec_path,order_path):
     rec_anno = read_rec(rec_path)
     det_anno = read_det(det_path)
     order_anno = read_order(order_path)
-    seq_text=list(range(len(order_anno.keys())))
     image = Image.open(ori_img_path).convert('RGB')
     draw = ImageDraw.Draw(image, 'RGB')
     for idx,annotation in enumerate(det_anno):
@@ -123,7 +122,6 @@ def vis_det_rec(ori_img_path,det_path,rec_path,order_path):
         tl,br = return_tl_rb(annotation["points"])
         poly_outline=(255,0,0)
         text = "\n".join([str(order_anno[idx])]+list(rec_anno[str(idx)]))
-        seq_text[order_anno[idx]]="".join(rec_anno[str(idx)])
         #poly_outline=(255,0,0)
         poly_center = (tl[0]+(abs(tl[0]-br[0]))/2,tl[1]+abs((tl[1]-br[1]))/2)
         poly_center = (poly_center[0]+(abs(tl[0]-br[0])/2),poly_center[1])
@@ -152,7 +150,16 @@ def vis_det_rec(ori_img_path,det_path,rec_path,order_path):
             fill=(255, 255, 255, 255),
             font=font
         )
-    return image,seq_text
+    return image
+def get_seq_text(det_path,rec_path,order_path):
+    rec_anno = read_rec(rec_path)
+    det_anno = read_det(det_path)
+    order_anno = read_order(order_path)
+    seq_text=list(range(len(order_anno.keys())))
+    for idx,annotation in enumerate(det_anno):
+        text = "\n".join([str(order_anno[idx])]+list(rec_anno[str(idx)]))
+        seq_text[order_anno[idx]]="".join(rec_anno[str(idx)])
+    return seq_text
 #eading order detection
 def order_preproc(img_path,det_result_path,preprocessed_file):
     try:
@@ -212,10 +219,11 @@ def save_pair(data):
     return re_lst
 if __name__ == "__main__":
     #read_order("../output/order_results/prediction.json")
-    order_preprocess_file = "../output/order_results/predict.json"
-    det_result_file = "../output/det_results/predicts.txt"
-    ori_img_path = "./saved/input_image.jpg"
-    order_preproc(ori_img_path,det_result_file,order_preprocess_file)
-    #vis_det_rec("./examples/YB_24_204.jpg","./predicts_db.txt","predicts_svtr_tiny_ch_all.txt")
-    #order_preproc("./processed/",["32-V023P0662.jpg"],"predicts_db.txt","./order_det/")
+    # order_preprocess_file = "../output/order_results/predict.json"
+    # det_result_file = "../output/det_results/predicts.txt"
+    # ori_img_path = "./saved/input_image.jpg"
+    seq_txt = get_seq_text(RESULT_FILES["DET_RESULT"],
+                           RESULT_FILES["REC_RESULT"],
+                           RESULT_FILES["ORDER_RESULT"])
+    print(seq_txt)
     print("end utils")

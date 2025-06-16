@@ -3,8 +3,9 @@ import numpy as np
 from PIL import Image
 import os
 import json
-from utils import *
+from utils import vis_det_rec, get_seq_text
 from pipline import detect_text, detect_order,recognize_text
+import subprocess
 import cv2
 import traceback
 from datetime import datetime
@@ -17,7 +18,8 @@ logging.basicConfig(
 )
 
 
-def process_image(filename, input_image,progress):
+def process_image(filename, input_image, progress):
+    print(filename)
     ori_img_path = os.path.join(FILE_DICT['SAVE_FOLDER'], filename)
     #save image first
     progress(0.1, desc="Saving image")
@@ -34,21 +36,26 @@ def process_image(filename, input_image,progress):
     recognize_text(ori_img_path,det_result_file,rec_result_file,debug=DEBUG)
     progress(0.8, desc="Visualizing results")
     #visualize det, rec, order results
-    img_vis,seq_txt=vis_det_rec(ori_img_path,
-                        det_result_file, 
-                        rec_result_file, 
-                        order_result_file)
+    seq_txt = get_seq_text(det_result_file,rec_result_file,order_result_file)
+    img_vis=vis_det_rec(ori_img_path,
+                        RESULT_FILES["DET_RESULT"], 
+                        RESULT_FILES["REC_RESULT"], 
+                        RESULT_FILES["ORDER_RESULT"])
     img_vis.save(os.path.join(FILE_DICT['PROCESSED_FOLDER'], filename))
-    return seq_txt
+    return img_vis,seq_txt
+# set examples
+example_folder = "./examples"
+examples = [
+    [os.path.join(example_folder, fname)]
+    for fname in sorted(os.listdir(example_folder))
+    if os.path.isfile(os.path.join(example_folder, fname))
+]
 
 def gradio_interface(input_image,progress=gr.Progress()):
     try:
         #human readable input naming
         filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
-        text_output = process_image(filename,input_image,progress)
-        processed_img_path = os.path.join(FILE_DICT['PROCESSED_FOLDER'], filename)
-        with Image.open(processed_img_path) as img:
-            output_image = img.copy()
+        output_image, text_output = process_image(filename,input_image,progress)
         # run clean bash
         subprocess.run(f"bash {CONFIG['CLEAN_SCRIPT']}",shell=True)
         logging.info("one request completed")
@@ -57,18 +64,15 @@ def gradio_interface(input_image,progress=gr.Progress()):
         logging.error(f"Error in Gradio interface: {e}")
         return None, f"Error: {str(e)}"
 
+# gradio interface
 iface = gr.Interface( 
     fn=gradio_interface,
     inputs=gr.Image(type="pil"),
     outputs=[
         gr.Image(type="pil"),
-        gr.Textbox(label="Image Info"),
+        gr.Textbox(label="Image Text"),
     ],
-    examples=[
-        ["./examples/JX_245_2_157.jpg"],
-        ["./examples/YB_24_204.jpg"],
-        ["./examples/06-V008P0195.jpg"],
-    ],
+    examples=examples,
     title="OCR system for Chinese Historical Documents(Machine Intelligence Group, MIG)"
 ).queue(concurrency_count=1)
 
