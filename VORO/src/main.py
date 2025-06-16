@@ -205,13 +205,12 @@ def main():
     mkdir(args.out_folder)
     save_log(args.out_folder+"log.txt",str(args))
     torch.manual_seed(args.seed)
-    torch.cuda.set_device(args.gpu)
-    device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else "cpu")
-    print("using device: ",device)
     
-    #num_features = 16#tr_dataset.get_num_features()
-    #hidden_size = num_features * 2
-    #model = MLP(num_features, hidden_size, 1).to(device)
+    device="cpu"
+    if int(args.gpu)!=-1:
+        device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available()  else "cpu")
+    print("using device: ",device)
+
     if args.model == "mobilenetv3":
         model = mobilenetv3_small(num_classes=1).to(device)
     else:
@@ -226,7 +225,7 @@ def main():
             tr_dataset, batch_size=args.batch_size, shuffle=True, num_workers=10,
         )
         print("Train num. samples: ", len(tr_dataset))
-        criterion = torch.nn.BCELoss().to(device)#torch.nn.CrossEntropyLoss().to(device)#BCEloss
+        criterion = torch.nn.BCELoss().to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=1)
     else:
@@ -289,14 +288,7 @@ def main():
                     )
                 )
                 break
-            #eval mode
-            # if ((epoch) % args.evaluate_rate) == 0:
-            #     #preds,idxs,images = predict(model, val_dataloader, device)
-            #     img_seqs = decode_pairs(preds,idxs,images)
-            #     scores = evaluate(img_seqs)
-            #     print("Val F(s,t), K(s,t) after {} epochs: {}, {}".format(epoch,
-            #         np.mean(scores["F"]),np.mean(scores["K"])))
-        #load best model:
+        #load best model
         model.load_state_dict(torch.load(os.path.join(args.out_folder, "model.pth")))
     print("evaluating...")
     te_dataloader = DataLoader(
@@ -313,9 +305,9 @@ def main():
     save_log(args.out_folder+"log.txt","average Footrules score: "+str(f_score))
     save_log(args.out_folder+"log.txt","average Kendall score: "+str(k_score))
 
-    with open(args.out_folder+"evaluation.json",'w')as wf:
+    with open(args.out_folder+"evaluated.json",'w')as wf:
         json.dump(scores,wf)
-    with open(args.out_folder+"prediction.json",'w')as wf:
+    with open(args.out_folder+"predicted.json",'w')as wf:
         json.dump(img_seqs,wf)
 
 if __name__ == "__main__":
