@@ -1,4 +1,3 @@
-# This README would be modified in the future
 # OCR System for Chinese Historical Documents with Image-Based Reading Order Detection
 
 **Author:** Hsing-Yuan Ma
@@ -9,97 +8,81 @@
 
 ## 🚀 Project Overview
 
-This project provides an advanced Optical Character Recognition (OCR) system tailored for **Chinese historical documents**, which are notoriously difficult for standard OCR due to their complex layouts and unique reading orders. Our system not only detects and recognizes text, but also **infers the correct reading order** using raw image features—an innovation that mirrors human reading perception.
+This project offers an advanced Optical Character Recognition (OCR) solution specialized for **Chinese historical documents**, uniquely addressing complex layouts and reading orders. It employs state-of-the-art methods for text detection and recognition and introduces an innovative approach for image-based reading order detection, significantly improving the accuracy and usability of digitized historical texts.
 
+## 🖼️ Sample Output
+
+Input image:
+
+![input](assets/example_1.jpg)
+
+Output with detected text, recognition results, and reading order:
+
+![output](assets/example_1_result.png)
 ---
 
 ## 🏆 Key Features
 
-* **State-of-the-art text detection** with Differential Binarization++ (DB++).
-* **High-accuracy text recognition** using SVTR Net.
-* **Novel Reading Order Detection (ROD)** module, leveraging both visual cues and spatial information to recover authentic reading sequences.
-* **Visualized output**: overlayed bounding boxes, recognized text, and reading order markers on original images.
-* **Modular, cloud-deployable architecture** with a modern web interface (Gradio).
+* **Text Detection:** Leveraging Differential Binarization++ (DB++)
+* **Text Recognition:** High accuracy with SVTR Net
+* **Reading Order Detection:** CNN-based approach combining visual and spatial information, utilizing the "First Decide then Decode" (FDTD) algorithm
+* **Visualized Outputs:** Interactive annotations with bounding boxes, recognized texts, and reading order indicators
+* **Dockerized Deployment:** Easily deployable using Docker and accessible via a modern Gradio interface
 
 ---
 
 ## 📚 System Pipeline
 
-1. **Input**
-   Upload an image of a historical Chinese document.
-
-2. **Text Detection**
-   The system locates and segments text regions using a trained DB++ model.
-
-3. **Text Recognition**
-   Each detected region is recognized as text using SVTR Net.
-
-4. **Reading Order Detection**
-   A CNN-based, multimodal model predicts the correct reading order by analyzing both image features and the spatial layout of text regions, following the "First Decide then Decode" (FDTD) algorithm.
-
-5. **Output**
-
-   * **Structured transcription**: digital text, ordered as in the original document.
-   * **Visual output**: input image annotated with bounding boxes, text, and reading order indicators.
+1. **Input:** Upload historical document images.
+2. **Text Detection:** Segments text regions using DB++.
+3. **Text Recognition:** Identifies text content using SVTR Net.
+4. **Reading Order Detection:** Determines reading sequence using multimodal CNN model.
+5. **Output:** Structured digital text with annotated visualizations.
 
 ---
 
 ## 🧑‍🔬 Model Training
 
-* **Dataset:** MTHv2, combining Tripitaka Koreana in Han (TKH) and Multiple Tripitaka in Han (MTH) datasets (\~3,199 images).
-* **Test split:**
+* **Datasets:** MTHv2 (Tripitaka Koreana in Han, Multiple Tripitaka in Han; \~3,199 images)
+* **Performance Metrics:**
 
-  * Text detection/recognition: 10%
-  * Reading order detection: 30%
-* **Performance:**
-
-  * **Text Detection:** F1 score of 0.95
-  * **Text Recognition:** Accuracy 0.83
-  * **Reading Order Detection:** Page error rate 5%
+  * **Text Detection:** F1 score = 0.95
+  * **Text Recognition:** Accuracy = 0.83
+  * **Reading Order Detection:** Page error rate = 5%
 
 ---
 
 ## 🛠️ Getting Started
 
-### **Requirements**
+### 📌 Requirements
 
-* Python 3.8+
-* CUDA-enabled GPU recommended
-* PaddleOCR and dependencies (see `requirements.txt`)
-* Model weights (see below)
+* Docker
+* CUDA-enabled GPU
 
-### **Installation**
+### 🐳 Deployment Using Docker
 
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-   cd YOUR_REPO_NAME
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Download models**
-   *(Models are not stored in this repo due to size. Run the provided download script or follow manual instructions in `README.md`.)*
-
-   ```bash
-   bash scripts/download_models.sh
-   ```
-
-   Place your detection, recognition, and ROD models in the `models/` directory.
-
-### **Running the App**
+#### 1. **Clone Repository**
 
 ```bash
-python app/main.py
+git clone https://github.com/Polo-Marco/HanDoc-OrderOCR.git
+cd HanDoc-OrderOCR
 ```
 
-* The Gradio web interface will launch.
-* Upload an image and receive both structured text and visualized results.
+#### 2. **Build Docker Image**
+
+```bash
+docker build -t chinese-historical-ocr .
+```
+
+#### 3. **Run Docker Container**
+
+```bash
+docker run --gpus all -p 9999:9999 chinese-historical-ocr
+```
+
+### 🌐 Access the Application
+
+* Open your browser at: `http://localhost:9999`
 
 ---
 
@@ -107,38 +90,34 @@ python app/main.py
 
 ```
 .
-├── app/                 # Core Python code (main.py, pipeline, utils, etc.)
-├── models/              # Downloaded model weights (not tracked in git)
-├── scripts/             # Helper scripts (e.g., download_models.sh, clean.sh)
-├── output/              # Generated outputs and temp files
-├── PaddleOCR/           # External OCR library
-├── VORO/                # External order detection code
-├── examples/            # Example images
-├── requirements.txt
+├── app/                 # Main application code (main.py, pipeline, utils)
+├── models/              # Model weights
+├── scripts/             # Utility scripts
+├── assets/              # Demo result
+├── output/              # Output files and temporary data
+├── PaddleOCR/           # PaddleOCR library
+├── VORO/                # Reading order detection module
+├── Dockerfile           # Docker configuration
+├── requirements.txt     # Python dependencies
 └── README.md
 ```
 
 ---
 
-## 📝 References
+## 📖 References
 
-* **Paper:**
-  *Reading between the Lines: Image-Based Order Detection in OCR for Chinese Historical Documents*
-  Hsing-Yuan Ma, Hen-Hsen Huang, Chao-Lin Liu
-  AAAI-24 ([PDF link if open](https://aaai.org/ojs/index.php/AAAI/article/view/27365))
+* **Paper:** [Reading between the Lines: Image-Based Order Detection in OCR for Chinese Historical Documents](https://aaai.org/ojs/index.php/AAAI/article/view/27365) *(Ma, Huang, Liu - AAAI 2024)*
+* **Methods and Algorithms:**
 
-* **Citations:**
-
-  * Liao et al. 2022: Differential Binarization++
-  * Du et al. 2022: SVTR Net
-  * Quiros & Vidal 2022: FDTD algorithm
+  * DB++ *(Liao et al., 2022)*
+  * SVTR Net *(Du et al., 2022)*
+  * FDTD algorithm *(Quiros & Vidal, 2022)*
 
 ---
 
 ## 🙏 Acknowledgements
 
-This work is based on research supported by National Chengchi University and Academia Sinica.
-We thank the open-source OCR and digital humanities community.
+Supported by National Chengchi University and Academia Sinica. Thanks to the open-source OCR community.
 
 ---
 
@@ -152,13 +131,8 @@ Open-source for academic and research use.
 
 ## ✨ Contact
 
-For questions, collaboration, or deployment advice, please contact **[hsingyuanma@gmail.com](mailto:hsingyuanma@gmail.com)**.
+For collaboration, deployment assistance, or inquiries, contact [hsingyuanma@gmail.com](mailto:hsingyuanma@gmail.com).
 
 ---
 
-*This project helps preserve the heritage of Chinese manuscripts by making them accessible and searchable for scholars and the public.*
-
----
-
-**Feel free to ask for a more concise/longer README or any specific section (cloud deploy, API usage, etc.)!**
-
+*This project helps preserve and unlock the cultural heritage of Chinese manuscripts, making historical documents accessible for research and exploration.*

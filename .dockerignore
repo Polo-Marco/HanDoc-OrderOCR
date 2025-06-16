@@ -10,4 +10,5 @@ app/saved/*
 *.pyc
 PaddleOCR/
 models/*
+assets/
 
