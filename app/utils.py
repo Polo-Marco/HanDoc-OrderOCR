@@ -1,30 +1,80 @@
 import cv2
 import numpy as np
+import os
 import json
 from PIL import ImageFont, ImageDraw, Image 
 import warnings
 from tqdm import tqdm
+import subprocess
+import logging
+from config import FILE_DICT,CONFIG
 warnings.filterwarnings('ignore')
 font = ImageFont.truetype("./font/NotoSerifCJKtc-ExtraLight.otf", 30)
-#prepocess of rec
+def path_exist(path)->bool:
+    return True if os.path.exists(path) else False
+def run_subprocess(cmd, desc=None, check_output=None, debug=True):
+    """
+    Runs a subprocess command with logging and error handling.
+
+    Args:
+        cmd (str): Command to execute.
+        desc (str): Description for logging.
+        check_output (str): Path to output file to check existence after run.
+        debug: for debugging subprocess
+    Returns:
+        CompletedProcess object.
+    Raises:
+        RuntimeError if command fails or output file does not exist.
+    """
+    if desc:
+        logging.info(f"Starting: {desc}")
+    else:
+        logging.info(f"Running: {cmd}")
+    if debug:
+        completed = subprocess.run(cmd, shell=True)
+    else:
+        completed = subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if completed.returncode != 0:
+        logging.error(f"Subprocess failed: {cmd}")
+        raise RuntimeError(f"Expected output file not found after {desc or cmd}")
+    if not path_exist(check_output):
+        raise RuntimeError(f"{desc or cmd} failed with return code {completed.returncode}")
+        logging.error(f"Expected output file missing: {check_output}")
+    logging.info(f"Subprocess completed: {cmd}")
+    return completed
+def crop_det_img(img_path,det_result_file)->None:
+    logging.info("cropping det results")
+    try:
+        det_anno = read_det(det_result_file)
+        img = cv2.imread(img_path)
+        for idx,anno in enumerate(det_anno):
+            crop_name = f"{img_path.split('/')[-1][:-4]}_{idx}.jpg"
+            cropped_img = crop_img(img,anno["points"],rotate=270)
+            out_path = os.path.join(FILE_DICT['REC_FOLDER'], crop_name)
+            cv2.imwrite(out_path, cropped_img)
+        logging.info("rec preprocess completed")
+    except Exception as error:
+        logging.error(f"rec preprocess failed with error: {error}")
+        raise RuntimeError(f"rec preprocess failed with error: {error}")
 def crop_img(img,poly_pts,pad_color="white",rotate=None):
-    rotate_map = {90:cv2.ROTATE_90_CLOCKWISE,180:cv2.ROTATE_180,270:cv2.ROTATE_90_COUNTERCLOCKWISE}#mapping to cv2 rotate code
+    #mapping to cv2 rotate code
+    rotate_map = {90:cv2.ROTATE_90_CLOCKWISE,180:cv2.ROTATE_180,270:cv2.ROTATE_90_COUNTERCLOCKWISE}
     pts = np.array(poly_pts,dtype=np.int32)
     ## (1) Crop the bounding rect
     rect = cv2.boundingRect(pts)
     x,y,w,h = rect
-    croped = img[y:y+h, x:x+w].copy()
+    cropped = img[y:y+h, x:x+w].copy()
 
     ## (2) make mask
     pts = pts - pts.min(axis=0)
 
-    mask = np.zeros(croped.shape[:2], np.uint8)
+    mask = np.zeros(cropped.shape[:2], np.uint8)
     cv2.drawContours(mask, [pts], -1, (255, 255, 255), -1, cv2.LINE_AA)
 
     ## (3) do bit-op
-    dst = cv2.bitwise_and(croped, croped, mask=mask)
+    dst = cv2.bitwise_and(cropped, cropped, mask=mask)
     ## (4) add the white background
-    bg = np.ones_like(croped, np.uint8)*255
+    bg = np.ones_like(cropped, np.uint8)*255
     cv2.bitwise_not(bg,bg, mask=mask)
     dst2 = bg+ dst
     if pad_color == "white":
@@ -50,9 +100,10 @@ def read_rec(rec_path):
             rec_anno[file]=anno
             line = f.readline()
     return rec_anno
-def read_order(filename,order_path):
-    with open(order_path+"prediction.json","r") as f:
-        data = json.load(f)[filename[:-4]]
+def read_order(order_path):
+    with open(order_path,"r") as f:
+        data = json.load(f)
+        data = data[list(data.keys())[0]]#extract the first item since only one image
     return {data[key]:key for key in data}#reverse annotation
         
 def return_tl_rb(boxes):
@@ -60,10 +111,10 @@ def return_tl_rb(boxes):
     ys = [box[1] for box in boxes]
     return (min(xs),min(ys)),(max(xs),max(ys))
 
-def vis_det_rec(filename,ori_img_path,det_path,rec_path,order_path):
+def vis_det_rec(ori_img_path,det_path,rec_path,order_path):
     rec_anno = read_rec(rec_path)
     det_anno = read_det(det_path)
-    order_anno = read_order(filename,order_path)
+    order_anno = read_order(order_path)
     seq_text=list(range(len(order_anno.keys())))
     image = Image.open(ori_img_path).convert('RGB')
     draw = ImageDraw.Draw(image, 'RGB')
@@ -76,7 +127,6 @@ def vis_det_rec(filename,ori_img_path,det_path,rec_path,order_path):
         #poly_outline=(255,0,0)
         poly_center = (tl[0]+(abs(tl[0]-br[0]))/2,tl[1]+abs((tl[1]-br[1]))/2)
         poly_center = (poly_center[0]+(abs(tl[0]-br[0])/2),poly_center[1])
-        #print(poly_center)
         # Draw sentence boxes
         draw.polygon(poly,
                      outline=poly_outline,
@@ -104,14 +154,18 @@ def vis_det_rec(filename,ori_img_path,det_path,rec_path,order_path):
         )
     return image,seq_text
 #eading order detection
-def order_preproc(img_path,filenames,det_path,save_path):
-    det_anno={}
-    for file in filenames:
-        height,width  = cv2.imread(img_path+file).shape[:2]
-        det_anno[file[:-4]]= {"line_label":[i["points"] for i in read_det(det_path)],
+def order_preproc(img_path,det_result_path,preprocessed_file):
+    try:
+        det_anno={}
+        filename = img_path.split("/")[-1][:-4]
+        height,width  = cv2.imread(img_path).shape[:2]
+        det_anno[filename]= {"line_label":[i["points"] for i in read_det(det_result_path)],
                         "width":width,"height":height}
-    with open(save_path+"predict.json",'w') as f:
+        with open(preprocessed_file,'w') as f:
             json.dump(save_pair(pair_data(det_anno)),f)
+    except Exception as error:
+        logging.error(f"Order preprocess failed with error: {error}")
+        raise RuntimeError(f"Order preprocess failed with error: {error}") 
 def pair_data(data_dict):
     '''
     input: imgs dict
@@ -157,7 +211,11 @@ def save_pair(data):
                          "height": data[img]["height"]})
     return re_lst
 if __name__ == "__main__":
-    read_order("./examples/YB_24_204.jpg","order_det/")
+    #read_order("../output/order_results/prediction.json")
+    order_preprocess_file = "../output/order_results/predict.json"
+    det_result_file = "../output/det_results/predicts.txt"
+    ori_img_path = "./saved/input_image.jpg"
+    order_preproc(ori_img_path,det_result_file,order_preprocess_file)
     #vis_det_rec("./examples/YB_24_204.jpg","./predicts_db.txt","predicts_svtr_tiny_ch_all.txt")
     #order_preproc("./processed/",["32-V023P0662.jpg"],"predicts_db.txt","./order_det/")
     print("end utils")
