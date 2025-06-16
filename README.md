@@ -48,7 +48,7 @@ Output with detected text, recognition results, and reading order:
 
   * **Text Detection:** F1 score = 0.95
   * **Text Recognition:** Accuracy = 0.83
-  * **Reading Order Detection:** Page error rate = 5%
+  * **Reading Order Detection:** Page Error Rate of 5%, meaning that only 5% of pages contain any order prediction errors (i.e., at least one text box is placed in an incorrect sequence).
 
 ---
 
