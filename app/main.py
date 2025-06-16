@@ -10,7 +10,7 @@ import cv2
 import traceback
 from datetime import datetime
 import logging
-from config import FILE_DICT, CONFIG, RESULT_FILES,DEBUG
+from config import FILE_DICT, CONFIG, RESULT_FILES, DEBUG
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,24 +19,22 @@ logging.basicConfig(
 
 
 def process_image(filename, input_image, progress):
-    print(filename)
+    logging.info(f"Processing {filename}")
     ori_img_path = os.path.join(FILE_DICT['SAVE_FOLDER'], filename)
     #save image first
     progress(0.1, desc="Saving image")
     input_image.save(ori_img_path)
     progress(0.2, desc="Detecting texts")
-    det_result_file = RESULT_FILES["DET_RESULT"]
-    detect_text(det_result_file,debug=DEBUG)
+    detect_text(debug=DEBUG)
     progress(0.5, desc="Detecting order")
-    order_preprocess_file = RESULT_FILES["ORDER_PREPROCESS"]
-    order_result_file = RESULT_FILES["ORDER_RESULT"]
-    detect_order(ori_img_path,det_result_file,order_preprocess_file,order_result_file,debug=DEBUG)
+    detect_order(ori_img_path,debug=DEBUG)
     progress(0.7, desc="Recognizing texts")
-    rec_result_file = RESULT_FILES["REC_RESULT"]
-    recognize_text(ori_img_path,det_result_file,rec_result_file,debug=DEBUG)
+    recognize_text(ori_img_path,debug=DEBUG)
     progress(0.8, desc="Visualizing results")
     #visualize det, rec, order results
-    seq_txt = get_seq_text(det_result_file,rec_result_file,order_result_file)
+    seq_txt = get_seq_text(RESULT_FILES["DET_RESULT"], 
+                        RESULT_FILES["REC_RESULT"], 
+                        RESULT_FILES["ORDER_RESULT"])
     img_vis=vis_det_rec(ori_img_path,
                         RESULT_FILES["DET_RESULT"], 
                         RESULT_FILES["REC_RESULT"], 

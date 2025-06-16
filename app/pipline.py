@@ -1,27 +1,27 @@
 import logging
 from utils import run_subprocess,order_preproc,crop_det_img, path_exist
-from config import FILE_DICT, CONFIG
+from config import FILE_DICT, CONFIG,RESULT_FILES
 
-def detect_text(det_result_file, debug=False):
+def detect_text(debug=False):
     run_subprocess(f"python3 {CONFIG['DET_SCRIPT']} -c {CONFIG['DET_CONFIG']} ",
                    desc="Text Detection",
-                   check_output=det_result_file,
+                   check_output=RESULT_FILES['DET_RESULT'],
                    debug=debug)
 
-def detect_order(ori_img_path,det_result_file,order_preprocess_file,order_result_file, debug=False):
+def detect_order(ori_img_path, debug=False):
     #preprocess order detection
-    order_preproc(ori_img_path,det_result_file,order_preprocess_file)
+    order_preproc(ori_img_path,RESULT_FILES['DET_RESULT'],RESULT_FILES['ORDER_PREPROCESS'])
     #check preprocess file exist
-    if not path_exist(order_preprocess_file):
-        logging.error(f"Expected output file missing: {order_preprocess_file}")
+    if not path_exist(RESULT_FILES['ORDER_PREPROCESS']):
+        logging.error(f"Expected output file missing: {RESULT_FILES['ORDER_PREPROCESS']}")
         raise RuntimeError(f"Order detection preprocess failed")
     # run order detection
     run_subprocess(f"bash {CONFIG['ORDER_SCRIPT']}",
-    desc="Order Detection", check_output=order_result_file,debug=debug)
+    desc="Order Detection", check_output=RESULT_FILES['ORDER_RESULT'],debug=debug)
     
-def recognize_text(ori_img_path,det_result_file,rec_result_file,debug=False):
-    rec_preprocess = crop_det_img(ori_img_path,det_result_file)
+def recognize_text(ori_img_path,debug=False):
+    rec_preprocess = crop_det_img(ori_img_path,RESULT_FILES['DET_RESULT'])
     run_subprocess(
     f"python3 {CONFIG['REC_SCRIPT']} -c {CONFIG['REC_CONFIG']}",
     desc="Test Recognition",
-    check_output=rec_result_file,debug=debug)
+    check_output=RESULT_FILES['REC_RESULT'],debug=debug)
