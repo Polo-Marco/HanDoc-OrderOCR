@@ -106,7 +106,7 @@ docker run --gpus all -p 9999:9999 chinese-historical-ocr
 
 ## 📖 References
 
-* **Paper:** [Reading between the Lines: Image-Based Order Detection in OCR for Chinese Historical Documents](https://aaai.org/ojs/index.php/AAAI/article/view/27365) *(Ma, Huang, Liu - AAAI 2024)*
+* **Paper:** [Reading between the Lines: Image-Based Order Detection in OCR for Chinese Historical Documents](https://ojs.aaai.org/index.php/AAAI/article/view/30572) *(Ma, Huang, Liu - AAAI 2024)*
 * **Methods and Algorithms:**
 
   * DB++ *(Liao et al., 2022)*
