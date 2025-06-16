@@ -77,7 +77,7 @@ docker build -t chinese-historical-ocr .
 #### 3. **Run Docker Container**
 
 ```bash
-docker run --gpus all -p 9999:9999 chinese-historical-ocr
+docker run --gpus all --shm-size 8g -p 9999:9999 chinese-historical-ocr
 ```
 
 ### 🌐 Access the Application
