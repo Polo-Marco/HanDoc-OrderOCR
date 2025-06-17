@@ -48,7 +48,7 @@ examples = [
     for fname in sorted(os.listdir(example_folder))
     if os.path.isfile(os.path.join(example_folder, fname))
 ]
-
+#TODO adjust clean bash with custom sub process run
 def gradio_interface(input_image,progress=gr.Progress()):
     try:
         #before process clean temp

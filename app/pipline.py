@@ -1,7 +1,7 @@
 import logging
 from utils import run_subprocess,order_preproc,crop_det_img, path_exist
 from config import FILE_DICT, CONFIG,RESULT_FILES
-
+#TODO check there are detected boxes if not return None 
 def detect_text(debug=False):
     run_subprocess(f"python3 {CONFIG['DET_SCRIPT']} -c {CONFIG['DET_CONFIG']} ",
                    desc="Text Detection",
