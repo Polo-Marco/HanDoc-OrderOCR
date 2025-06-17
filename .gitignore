@@ -17,4 +17,3 @@ app/saved/*
 PaddleOCR/
 models/*
 !models/.gitkeep
-

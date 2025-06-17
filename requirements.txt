@@ -4,3 +4,4 @@ gdown
 torch
 torchvision
 numpy
+pre-commit
