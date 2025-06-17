@@ -4,7 +4,7 @@ Global:
   epoch_num: 1200
   log_smooth_window: 20
   print_batch_step: 30
-  save_model_dir: 
+  save_model_dir:
   save_epoch_step: 600
   eval_batch_step:
   - 1000
@@ -12,7 +12,7 @@ Global:
   cal_metric_during_train: false
   pretrained_model: ../models/det_model/inference
   checkpoints:
-  save_inference_dir: 
+  save_inference_dir:
   use_visualdl: false
   infer_mode: true
   infer_img: ./saved/
@@ -61,9 +61,9 @@ Metric:
 Eval:
   dataset:
     name: SimpleDataSet
-    data_dir:                                                          
-    label_file_list:                                                                                            
-    - 
+    data_dir:
+    label_file_list:
+    -
     transforms:
     - DecodeImage:
         img_mode: RGB

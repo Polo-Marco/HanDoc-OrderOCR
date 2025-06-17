@@ -48,6 +48,5 @@ WORKDIR /app/app
 # Expose Gradio/Flask/your app port (adjust if needed)
 EXPOSE 9999
 
-# Start the application 
+# Start the application
 CMD ["python", "main.py"]
-

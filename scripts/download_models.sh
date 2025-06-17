@@ -17,4 +17,3 @@ echo "Downloading reading order model..."
 gdown --id 185NiiuUxQN8uUrZPJSUakFg7D9jc1qPd -O models/order_model/inference.pth
 
 echo "All models downloaded!"
-

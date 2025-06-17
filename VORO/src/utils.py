@@ -1,5 +1,5 @@
-import os
 import errno
+import os
 
 
 def mkdir(path):
@@ -13,11 +13,12 @@ def mkdir(path):
 def files_exist(files):
     return all([os.path.exists(f) for f in files])
 
-def save_log(path,save_str):
+
+def save_log(path, save_str):
     if os.path.exists(path):
-        f=open(path,"a")
+        f = open(path, "a")
     else:
-        f=open(path,"w")
+        f = open(path, "w")
     f.write(save_str)
     f.write("\n")
     return None
