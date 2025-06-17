@@ -14,11 +14,11 @@ This project offers an advanced Optical Character Recognition (OCR) solution spe
 
 To see the system in action, check out the demo video and screenshot below!
 
-[![Watch the Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=RWgGDymY2Bc)
-<!-- Replace YOUR_VIDEO_ID with the actual video ID from your YouTube URL -->
+[![Watch the Demo](https://img.youtube.com/vi/RWgGDymY2Bc/0.jpg)](https://www.youtube.com/watch?v=RWgGDymY2Bc)
+
 
 <p align="center">
-  <img src="system_demo.png" alt="System Demo Screenshot" width="600"/>
+  <img src="assets/system_demo.png" alt="System Demo Screenshot" width="600"/>
 </p>
 
 
