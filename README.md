@@ -12,8 +12,7 @@ This project offers an advanced Optical Character Recognition (OCR) solution spe
 
 ## Try It in Google Colab
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]
-(https://colab.research.google.com/drive/1Pzalb0VztHhWkvbc0xuCZ-4PQDJT7-Dt?usp=sharing)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Pzalb0VztHhWkvbc0xuCZ-4PQDJT7-Dt?usp=sharing)
 
 Just click the badge above to run our notebook in Colab!
 
