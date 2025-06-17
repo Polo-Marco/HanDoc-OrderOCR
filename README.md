@@ -10,6 +10,18 @@
 
 This project offers an advanced Optical Character Recognition (OCR) solution specialized for **Chinese historical documents**, uniquely addressing complex layouts and reading orders. It employs state-of-the-art methods for text detection and recognition and introduces an innovative approach for image-based reading order detection, significantly improving the accuracy and usability of digitized historical texts. You can try it with google Colab!
 
+## 🚀 System Demo
+
+To see the system in action, check out the demo video and screenshot below!
+
+[![Watch the Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=RWgGDymY2Bc)
+<!-- Replace YOUR_VIDEO_ID with the actual video ID from your YouTube URL -->
+
+<p align="center">
+  <img src="system_demo.png" alt="System Demo Screenshot" width="600"/>
+</p>
+
+
 ## 🖼️ Sample Output
 
 Input image:
