@@ -55,7 +55,7 @@ def run_subprocess(cmd, desc=None, check_output=None, debug=True):
 
 
 def crop_det_img(img_path, det_result_file) -> None:
-    logging.info("cropping det results")
+    logging.info("Cropping detected text boxes")
     try:
         det_anno = read_det(det_result_file)
         img = cv2.imread(img_path)
@@ -64,10 +64,10 @@ def crop_det_img(img_path, det_result_file) -> None:
             cropped_img = crop_img(img, anno["points"], rotate=270)
             out_path = os.path.join(FILE_DICT["REC_FOLDER"], crop_name)
             cv2.imwrite(out_path, cropped_img)
-        logging.info("rec preprocess completed")
+        logging.info("Recognition preprocess completed")
     except Exception as error:
-        logging.error(f"rec preprocess failed with error: {error}")
-        raise RuntimeError(f"rec preprocess failed with error: {error}")
+        logging.error(f"Recognition preprocess failed with error: {error}")
+        raise RuntimeError(f"Recognition preprocess failed with error: {error}")
 
 
 def crop_img(img, poly_pts, pad_color="white", rotate=None):

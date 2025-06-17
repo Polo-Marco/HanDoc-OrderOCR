@@ -60,7 +60,7 @@ def gradio_interface(input_image, progress=gr.Progress()):
         output_image, text_output = process_image(filename, input_image, progress)
         # run clean bash
         clean_temp(DEBUG)
-        logging.info("one request completed")
+        logging.info("One request completed")
         return output_image, ",".join(text_output)
     except Exception as e:
         logging.error(f"Error in Gradio interface: {e}")
