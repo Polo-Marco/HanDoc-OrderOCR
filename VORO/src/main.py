@@ -262,7 +262,11 @@ def main():
         model = mobilenetv3_small(num_classes=1).to(device)
     else:
         model = CNNNet(num_classes=1).to(device)
-    if not args.eval_only:
+    if args.eval_only:
+        print("evaluation only")
+        checkpoint = torch.load(args.model_path, map_location=device)
+        model.load_state_dict(checkpoint)
+    else:
         tr_dataset = MTHv2PairImageDataset(
             args.tr_data,
             args.image_path,
@@ -278,33 +282,29 @@ def main():
             shuffle=True,
             num_workers=10,
         )
+
         print("Train num. samples: ", len(tr_dataset))
+        val_dataset = MTHv2PairImageDataset(
+            args.val_data,
+            args.image_path,
+            RegionType="line",
+            image_size=args.image_size,
+            image_flag=args.image_flag,
+        )
+        print("Val num. pairs: ", len(val_dataset))
+        val_dataloader = DataLoader(
+            val_dataset,
+            batch_size=args.batch_size,
+            shuffle=False,
+            num_workers=10,
+        )
         criterion = torch.nn.BCELoss().to(device)
         optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, mode="min", factor=0.5, patience=1
         )
-    else:
-        print("evaluation only")
-        checkpoint = torch.load(args.model_path, map_location=device)
-        model.load_state_dict(checkpoint)
-        # model.load_state_dict(torch.load(args.model_path), map_location=device)
-
     # --- val data
-    val_dataset = MTHv2PairImageDataset(
-        args.val_data,
-        args.image_path,
-        RegionType="line",
-        image_size=args.image_size,
-        image_flag=args.image_flag,
-    )
-    print("Val num. pairs: ", len(val_dataset))
-    val_dataloader = DataLoader(
-        val_dataset,
-        batch_size=args.batch_size,
-        shuffle=False,
-        num_workers=10,
-    )
+
     te_dataset = MTHv2PairImageDataset(
         args.te_data,
         args.image_path,
@@ -359,7 +359,7 @@ def main():
                 break
         # load best model
         model.load_state_dict(torch.load(os.path.join(args.out_folder, "model.pth")))
-    print("evaluating...")
+    print("predicting...")
     te_dataloader = DataLoader(
         te_dataset,
         batch_size=args.batch_size,
