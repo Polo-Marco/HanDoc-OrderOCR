@@ -4,7 +4,7 @@ from PIL import Image
 import os
 import json
 from utils import vis_det_rec, get_seq_text
-from pipline import detect_text, detect_order,recognize_text
+from pipline import detect_text, detect_order,recognize_text,clean_temp
 import subprocess
 import cv2
 import traceback
@@ -48,16 +48,15 @@ examples = [
     for fname in sorted(os.listdir(example_folder))
     if os.path.isfile(os.path.join(example_folder, fname))
 ]
-#TODO adjust clean bash with custom sub process run
 def gradio_interface(input_image,progress=gr.Progress()):
     try:
         #before process clean temp
-        subprocess.run(f"bash {CONFIG['CLEAN_SCRIPT']}",shell=True)
+        clean_temp(DEBUG)
         #human readable input naming
         filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jpg"
         output_image, text_output = process_image(filename,input_image,progress)
         # run clean bash
-        subprocess.run(f"bash {CONFIG['CLEAN_SCRIPT']}",shell=True)
+        clean_temp(DEBUG)
         logging.info("one request completed")
         return output_image, ",".join(text_output)
     except Exception as e:

@@ -36,10 +36,10 @@ def run_subprocess(cmd, desc=None, check_output=None, debug=True):
         completed = subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if completed.returncode != 0:
         logging.error(f"Subprocess failed: {cmd}")
-        raise RuntimeError(f"Expected output file not found after {desc or cmd}")
-    if not path_exist(check_output):
         raise RuntimeError(f"{desc or cmd} failed with return code {completed.returncode}")
+    if check_output and not path_exist(check_output):
         logging.error(f"Expected output file missing: {check_output}")
+        raise RuntimeError(f"{desc or cmd} failed with no output file {check_output}")
     logging.info(f"Subprocess completed: {cmd}")
     return completed
 def crop_det_img(img_path,det_result_file)->None:

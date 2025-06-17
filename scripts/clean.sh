@@ -1,5 +1,5 @@
-rm  -r ../output/det_results/*
-rm  ../output/rec_images/*
-rm  ../output/order_results/*
-rm ../output/rec_results/*
-rm ./saved/*
+rm  -rf ../output/det_results/*
+rm  -f ../output/rec_images/*
+rm  -f ../output/order_results/*
+rm -f ../output/rec_results/*
+rm -f ./saved/*
