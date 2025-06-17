@@ -12,14 +12,10 @@ This project offers an advanced Optical Character Recognition (OCR) solution spe
 
 ## 🚀 System Demo
 
-To see the system in action, check out the demo video and screenshot below!
-
-[![Watch the Demo](https://img.youtube.com/vi/RWgGDymY2Bc/0.jpg)](https://www.youtube.com/watch?v=RWgGDymY2Bc)
+To see the system in action, check out the [demo video](https://www.youtube.com/watch?v=RWgGDymY2Bc) and screenshot below!
 
 
-<p align="center">
-  <img src="assets/system_demo.png" alt="System Demo Screenshot" width="600"/>
-</p>
+![sys_demo](assets/system_demo.png)
 
 
 ## 🖼️ Sample Output
