@@ -4,7 +4,6 @@ from config import CONFIG, RESULT_FILES
 from utils import crop_det_img, order_preproc, path_exist, run_subprocess
 
 
-# TODO check there are detected boxes if not return None
 def detect_text(debug=False) -> None:
     run_subprocess(
         f"python3 {CONFIG['DET_SCRIPT']} -c {CONFIG['DET_CONFIG']} ",

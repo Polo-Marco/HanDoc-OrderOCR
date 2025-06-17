@@ -1,9 +1,10 @@
 import logging
 import os
 
-# Import your pipeline and config
-from main import FILE_DICT, process_image
+from config import FILE_DICT
+from main import process_image
 from PIL import Image
+from pipline import clean_temp
 
 
 def dummy_progress(p, desc=""):
@@ -38,6 +39,8 @@ def test_process_image():
     ), f"Processed image not found: {processed_img_path}"
     assert img_vis is not None, "No visualization image returned."
     assert seq_txt is not None, "No sequence text returned."
+    # run clean bash
+    clean_temp(debug=True)
     logging.info("All checks passed!")
 
 

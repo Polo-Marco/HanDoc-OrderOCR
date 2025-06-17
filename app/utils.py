@@ -6,7 +6,7 @@ import warnings
 
 import cv2
 import numpy as np
-from config import FILE_DICT, RESULT_FILES
+from config import FILE_DICT
 from PIL import Image, ImageDraw, ImageFont
 from tqdm import tqdm
 
@@ -185,12 +185,10 @@ def get_seq_text(det_path, rec_path, order_path):
     order_anno = read_order(order_path)
     seq_text = list(range(len(order_anno.keys())))
     for idx, annotation in enumerate(det_anno):
-        # text = "\n".join([str(order_anno[idx])]+list(rec_anno[str(idx)]))
         seq_text[order_anno[idx]] = "".join(rec_anno[str(idx)])
     return seq_text
 
 
-# eading order detection
 def order_preproc(img_path, det_result_path, preprocessed_file):
     try:
         det_anno = {}
@@ -201,6 +199,13 @@ def order_preproc(img_path, det_result_path, preprocessed_file):
             "width": width,
             "height": height,
         }
+        if len(det_anno[filename]["line_label"]) == 0:
+            raise ValueError(
+                "No text lines were detected in the image. "
+                "Possible reasons: the detection model failed, "
+                "or there may be no recognizable text in the uploaded image. "
+                "Tip: For best results, please upload historical Chinese documents or use provided examples"
+            )
         with open(preprocessed_file, "w") as f:
             json.dump(save_pair(pair_data(det_anno)), f)
     except Exception as error:
@@ -263,14 +268,4 @@ def save_pair(data):
 
 
 if __name__ == "__main__":
-    # read_order("../output/order_results/prediction.json")
-    # order_preprocess_file = "../output/order_results/predict.json"
-    # det_result_file = "../output/det_results/predicts.txt"
-    # ori_img_path = "./saved/input_image.jpg"
-    seq_txt = get_seq_text(
-        RESULT_FILES["DET_RESULT"],
-        RESULT_FILES["REC_RESULT"],
-        RESULT_FILES["ORDER_RESULT"],
-    )
-    print(seq_txt)
     print("end utils")
