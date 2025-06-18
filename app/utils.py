@@ -243,7 +243,8 @@ def pair(seq, width, height):
                 continue
             feature = flatten_lst(seq[i]) + flatten_lst(seq[j])
             normalized_feature = [
-                elem if idx % 2 else elem for idx, elem in enumerate(feature)
+                elem / width if idx % 2 == 0 else elem / height
+                for idx, elem in enumerate(feature)
             ]
             re_lst.append(normalized_feature)
             pair.append([i, j])
