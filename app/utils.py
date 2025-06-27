@@ -120,10 +120,10 @@ def read_rec(rec_path):
     return rec_anno
 
 
-def read_order(filename, order_path):
-    """Return mapping from detection index to predicted order index."""
+def read_order(order_path):
     with open(order_path, "r") as f:
-        data = json.load(f)[filename[:-4]]
+        data = json.load(f)
+        data = data[list(data.keys())[0]]  # extract the first item since only one image
     return {data[key]: key for key in data}
 
 
@@ -133,7 +133,7 @@ def return_tl_rb(boxes):
     return (min(xs), min(ys)), (max(xs), max(ys))
 
 
-def vis_det_rec(filename, ori_img_path, det_path, rec_path, order_path):
+def vis_det_rec(ori_img_path, det_path, rec_path, order_path):
     """Visualize detection and recognition results with reading order."""
     rec_anno = read_rec(rec_path)
     det_anno = read_det(det_path)
@@ -176,6 +176,7 @@ def vis_det_rec(filename, ori_img_path, det_path, rec_path, order_path):
             font=font,
         )
     return image, seq_text
+
 
 def order_preproc(img_path, det_result_path, preprocessed_file):
     try:
