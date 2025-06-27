@@ -8,7 +8,7 @@ except ModuleNotFoundError:  # pragma: no cover - optional dependency
     gr = None
 from config import DEBUG, FILE_DICT, RESULT_FILES
 from pipline import clean_temp, detect_order, detect_text, recognize_text
-from utils import get_seq_text, vis_det_rec
+from utils import vis_det_rec
 
 logging.basicConfig(
     level=logging.INFO,
@@ -30,12 +30,8 @@ def process_image(filename, input_image, progress):
     recognize_text(ori_img_path, debug=DEBUG)
     progress(0.8, desc="Visualizing results")
     # visualize det, rec, order results
-    seq_txt = get_seq_text(
-        RESULT_FILES["DET_RESULT"],
-        RESULT_FILES["REC_RESULT"],
-        RESULT_FILES["ORDER_RESULT"],
-    )
-    img_vis = vis_det_rec(
+    img_vis, seq_txt = vis_det_rec(
+        filename,
         ori_img_path,
         RESULT_FILES["DET_RESULT"],
         RESULT_FILES["REC_RESULT"],

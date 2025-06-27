@@ -120,11 +120,11 @@ def read_rec(rec_path):
     return rec_anno
 
 
-def read_order(order_path):
+def read_order(filename, order_path):
+    """Return mapping from detection index to predicted order index."""
     with open(order_path, "r") as f:
-        data = json.load(f)
-        data = data[list(data.keys())[0]]  # extract the first item since only one image
-    return {data[key]: key for key in data}  # reverse annotation
+        data = json.load(f)[filename[:-4]]
+    return {data[key]: key for key in data}
 
 
 def return_tl_rb(boxes):
@@ -133,26 +133,25 @@ def return_tl_rb(boxes):
     return (min(xs), min(ys)), (max(xs), max(ys))
 
 
-def vis_det_rec(ori_img_path, det_path, rec_path, order_path):
+def vis_det_rec(filename, ori_img_path, det_path, rec_path, order_path):
+    """Visualize detection and recognition results with reading order."""
     rec_anno = read_rec(rec_path)
     det_anno = read_det(det_path)
-    order_anno = read_order(order_path)
+    order_anno = read_order(filename, order_path)
+    seq_text = list(range(len(order_anno.keys())))
     image = Image.open(ori_img_path).convert("RGB")
     draw = ImageDraw.Draw(image, "RGB")
     for idx, annotation in enumerate(det_anno):
-        poly = [
-            elem for elem1 in annotation["points"] for elem in elem1
-        ]  # flat 2d cordinates to 1d
+        poly = [elem for elem1 in annotation["points"] for elem in elem1]
         tl, br = return_tl_rb(annotation["points"])
         poly_outline = (255, 0, 0)
         text = "\n".join([str(order_anno[idx])] + list(rec_anno[str(idx)]))
-        # poly_outline=(255,0,0)
+        seq_text[order_anno[idx]] = "".join(rec_anno[str(idx)])
         poly_center = (
             tl[0] + (abs(tl[0] - br[0])) / 2,
             tl[1] + abs((tl[1] - br[1])) / 2,
         )
         poly_center = (poly_center[0] + (abs(tl[0] - br[0]) / 2), poly_center[1])
-        # Draw sentence boxes
         draw.polygon(poly, outline=poly_outline, width=3)
         l_u_point = poly_center
         if hasattr(draw, "textbbox"):
@@ -176,17 +175,9 @@ def vis_det_rec(ori_img_path, det_path, rec_path, order_path):
             fill=(255, 255, 255, 255),
             font=font,
         )
-    return image
+    return image, seq_text
 
 
-def get_seq_text(det_path, rec_path, order_path):
-    rec_anno = read_rec(rec_path)
-    det_anno = read_det(det_path)
-    order_anno = read_order(order_path)
-    seq_text = list(range(len(order_anno.keys())))
-    for idx, annotation in enumerate(det_anno):
-        seq_text[order_anno[idx]] = "".join(rec_anno[str(idx)])
-    return seq_text
 
 
 def order_preproc(img_path, det_result_path, preprocessed_file):
