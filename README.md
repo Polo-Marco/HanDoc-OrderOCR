@@ -99,16 +99,17 @@ docker run --gpus all --shm-size 4g -p 9999:9999 chinese-historical-ocr
 ```
 .
 ├── app/                 # Main application code (main.py, pipeline, utils)
-├── models/              # Model weights
+├── configs/             # Configuration files
 ├── scripts/             # Utility scripts
 ├── assets/              # Demo result
 ├── output/              # Output files and temporary data
-├── PaddleOCR/           # PaddleOCR library
 ├── VORO/                # Reading order detection module
-├── Dockerfile           # Docker configuration
+├── dockerfile           # Docker configuration
 ├── requirements.txt     # Python dependencies
 └── README.md
 ```
+
+`models/` and `PaddleOCR/` directories are created automatically during setup.
 
 ---
 

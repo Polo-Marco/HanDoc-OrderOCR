@@ -37,7 +37,7 @@ def recognize_text(ori_img_path, debug=False) -> None:
     crop_det_img(ori_img_path, RESULT_FILES["DET_RESULT"])
     run_subprocess(
         f"python3 {CONFIG['REC_SCRIPT']} -c {CONFIG['REC_CONFIG']}",
-        desc="Test Recognition",
+        desc="Text Recognition",
         check_output=RESULT_FILES["REC_RESULT"],
         debug=debug,
     )
