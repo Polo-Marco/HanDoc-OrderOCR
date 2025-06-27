@@ -137,7 +137,7 @@ def vis_det_rec(filename, ori_img_path, det_path, rec_path, order_path):
     """Visualize detection and recognition results with reading order."""
     rec_anno = read_rec(rec_path)
     det_anno = read_det(det_path)
-    order_anno = read_order(filename, order_path)
+    order_anno = read_order(order_path)
     seq_text = list(range(len(order_anno.keys())))
     image = Image.open(ori_img_path).convert("RGB")
     draw = ImageDraw.Draw(image, "RGB")
@@ -176,9 +176,6 @@ def vis_det_rec(filename, ori_img_path, det_path, rec_path, order_path):
             font=font,
         )
     return image, seq_text
-
-
-
 
 def order_preproc(img_path, det_result_path, preprocessed_file):
     try:
@@ -234,8 +231,7 @@ def pair(seq, width, height):
                 continue
             feature = flatten_lst(seq[i]) + flatten_lst(seq[j])
             normalized_feature = [
-                elem / width if idx % 2 == 0 else elem / height
-                for idx, elem in enumerate(feature)
+                elem if idx % 2 else elem for idx, elem in enumerate(feature)
             ]
             re_lst.append(normalized_feature)
             pair.append([i, j])

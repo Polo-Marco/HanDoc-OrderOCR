@@ -17,3 +17,8 @@ app/saved/*
 PaddleOCR/
 models/*
 !models/.gitkeep
+CACHEDIR.TAG
+bin/
+lib/
+pyvenv.cfg
+share/

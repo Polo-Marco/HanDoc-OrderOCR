@@ -2,10 +2,7 @@ import logging
 import os
 from datetime import datetime
 
-try:
-    import gradio as gr
-except ModuleNotFoundError:  # pragma: no cover - optional dependency
-    gr = None
+import gradio as gr
 from config import DEBUG, FILE_DICT, RESULT_FILES
 from pipline import clean_temp, detect_order, detect_text, recognize_text
 from utils import vis_det_rec
@@ -31,7 +28,6 @@ def process_image(filename, input_image, progress):
     progress(0.8, desc="Visualizing results")
     # visualize det, rec, order results
     img_vis, seq_txt = vis_det_rec(
-        filename,
         ori_img_path,
         RESULT_FILES["DET_RESULT"],
         RESULT_FILES["REC_RESULT"],
@@ -50,12 +46,7 @@ examples = [
 ]
 
 
-def gradio_interface(input_image, progress=None):
-    if progress is None:
-        if gr:
-            progress = gr.Progress()
-        else:
-            progress = lambda *a, **k: None
+def gradio_interface(input_image, progress=gr.Progress()):
     try:
         # before process clean temp
         clean_temp(DEBUG)
@@ -72,21 +63,17 @@ def gradio_interface(input_image, progress=None):
 
 
 # gradio interface
-if gr:
-    iface = gr.Interface(
-        fn=gradio_interface,
-        inputs=gr.Image(type="pil"),
-        outputs=[
-            gr.Image(type="pil"),
-            gr.Textbox(label="Image Text"),
-        ],
-        examples=examples,
-        title="OCR system for Chinese Historical Documents(Machine Intelligence Group, MIG)",
-    ).queue(concurrency_count=1)
+iface = gr.Interface(
+    fn=gradio_interface,
+    inputs=gr.Image(type="pil"),
+    outputs=[
+        gr.Image(type="pil"),
+        gr.Textbox(label="Image Text"),
+    ],
+    examples=examples,
+    title="OCR system for Chinese Historical Documents(Machine Intelligence Group, MIG)",
+).queue(concurrency_count=1)
 
-    if __name__ == "__main__":
-        # launch gradio
-        iface.launch(share=False, server_port=9999, server_name="0.0.0.0", debug=DEBUG)
-else:
-    if __name__ == "__main__":
-        logging.error("gradio is not installed. Unable to launch the interface.")
+if __name__ == "__main__":
+    # launch gradio
+    iface.launch(share=False, server_port=9999, server_name="0.0.0.0", debug=DEBUG)
