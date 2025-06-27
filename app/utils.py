@@ -121,10 +121,16 @@ def read_rec(rec_path):
 
 
 def read_order(order_path):
+    """Return mapping from detection index to predicted order index."""
     with open(order_path, "r") as f:
         data = json.load(f)
-        data = data[list(data.keys())[0]]  # extract the first item since only one image
-    return {data[key]: key for key in data}  # reverse annotation
+
+    # predicted.json only contains a single entry with the image name as the key
+    # and a list indicating the reading order of detection indices
+    orders = list(data.values())[0]
+
+    # convert to {det_idx: order_idx}
+    return {int(det_idx): order_idx for order_idx, det_idx in enumerate(orders)}
 
 
 def return_tl_rb(boxes):
@@ -145,7 +151,8 @@ def vis_det_rec(ori_img_path, det_path, rec_path, order_path):
         ]  # flat 2d cordinates to 1d
         tl, br = return_tl_rb(annotation["points"])
         poly_outline = (255, 0, 0)
-        text = "\n".join([str(order_anno[idx])] + list(rec_anno[str(idx)]))
+        # Display the predicted order index followed by the recognized text
+        text = f"{order_anno.get(idx, '?')}: {rec_anno.get(str(idx), '')}"
         # poly_outline=(255,0,0)
         poly_center = (
             tl[0] + (abs(tl[0] - br[0])) / 2,
@@ -185,7 +192,8 @@ def get_seq_text(det_path, rec_path, order_path):
     order_anno = read_order(order_path)
     seq_text = list(range(len(order_anno.keys())))
     for idx, annotation in enumerate(det_anno):
-        seq_text[order_anno[idx]] = "".join(rec_anno[str(idx)])
+        rec_text = rec_anno.get(str(idx), "")
+        seq_text[order_anno.get(idx, 0)] = rec_text
     return seq_text
 
 
