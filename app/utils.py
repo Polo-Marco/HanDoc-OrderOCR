@@ -137,6 +137,7 @@ def vis_det_rec(ori_img_path, det_path, rec_path, order_path):
     rec_anno = read_rec(rec_path)
     det_anno = read_det(det_path)
     order_anno = read_order(order_path)
+    seq_text = list(range(len(order_anno.keys())))
     image = Image.open(ori_img_path).convert("RGB")
     draw = ImageDraw.Draw(image, "RGB")
     for idx, annotation in enumerate(det_anno):
@@ -146,12 +147,14 @@ def vis_det_rec(ori_img_path, det_path, rec_path, order_path):
         tl, br = return_tl_rb(annotation["points"])
         poly_outline = (255, 0, 0)
         text = "\n".join([str(order_anno[idx])] + list(rec_anno[str(idx)]))
+        seq_text[order_anno[idx]] = "".join(rec_anno[str(idx)])
         # poly_outline=(255,0,0)
         poly_center = (
             tl[0] + (abs(tl[0] - br[0])) / 2,
             tl[1] + abs((tl[1] - br[1])) / 2,
         )
         poly_center = (poly_center[0] + (abs(tl[0] - br[0]) / 2), poly_center[1])
+        # print(poly_center)
         # Draw sentence boxes
         draw.polygon(poly, outline=poly_outline, width=3)
         l_u_point = poly_center
@@ -176,17 +179,7 @@ def vis_det_rec(ori_img_path, det_path, rec_path, order_path):
             fill=(255, 255, 255, 255),
             font=font,
         )
-    return image
-
-
-def get_seq_text(det_path, rec_path, order_path):
-    rec_anno = read_rec(rec_path)
-    det_anno = read_det(det_path)
-    order_anno = read_order(order_path)
-    seq_text = list(range(len(order_anno.keys())))
-    for idx, annotation in enumerate(det_anno):
-        seq_text[order_anno[idx]] = "".join(rec_anno[str(idx)])
-    return seq_text
+    return image, seq_text
 
 
 def order_preproc(img_path, det_result_path, preprocessed_file):
@@ -243,8 +236,7 @@ def pair(seq, width, height):
                 continue
             feature = flatten_lst(seq[i]) + flatten_lst(seq[j])
             normalized_feature = [
-                elem / width if idx % 2 == 0 else elem / height
-                for idx, elem in enumerate(feature)
+                elem if idx % 2 else elem for idx, elem in enumerate(feature)
             ]
             re_lst.append(normalized_feature)
             pair.append([i, j])
